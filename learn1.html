@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>Todo List</title>
+</head>
+<body>
+  <h1>我的 Todo List</h1>
+
+  <!-- 输入框 + 按钮 -->
+  <input id="taskInput" type="text" placeholder="输入任务...">
+  <button onclick="addTask()">添加任务</button>
+
+  <!-- 任务列表容器 -->
+  <ul id="taskList"></ul>
+
+  <script>
+    const key = "todoList";
+    let todos = loadTodos();
+    renderTodos();
+
+    //Step B
+    function saveTodos(todos){
+        localStorage.setItem(key , JSON.stringify(todos));
+    }
+
+    function loadTodos(){
+        return JSON.parse(localStorage.getItem(key) || "[]");
+    }
+
+    function renderTodos(){
+        const ul = document.getElementById("taskList");
+        ul.innerHTML = "";
+
+        todos.forEach((task , index) => {
+            const li = document.createElement("li");
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.checked = task.done;
+            li.appendChild(checkbox);
+
+            const textNode = document.createTextNode(task.text);
+            li.appendChild(textNode);
+
+            if(task.done){
+                li.style.textDecoration = "line-through";
+                li.style.color = "gray";
+            }
+
+            checkbox.onchange = () => {
+                todos[index].done = checkbox.checked;
+                saveTodos(todos);
+                renderTodos();
+            }
+
+            const delBtn = document.createElement("button");
+            delBtn.textContent = "删除";
+            delBtn.onclick = () => del(index);
+            li.appendChild(delBtn);
+            ul.appendChild(li);
+        });
+        }
+    
+    function addTask(){
+        const input = document.getElementById("taskInput");
+        const taskName = input.value.trim();
+
+        if(taskName === "")return;
+
+        todos.push({ text: taskName , done: false});
+        saveTodos(todos);
+        renderTodos();
+        input.value = "";
+    }
+    
+    function del(index){
+        todos.splice(index , 1);
+        saveTodos(todos);
+        renderTodos();
+      }      
+
+
+
+
+</script>
+
+</body>
+</html>
+
